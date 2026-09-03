@@ -1,0 +1,266 @@
+{
+  "info": {
+    "name": "Auth Service",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "description": "JWT Authentication endpoints for the Auth Service.\n\nFlow:\n1. Run **Register** or **Login** — the token is automatically saved to the `jwt_token` collection variable.\n2. All protected requests use that token automatically via the collection-level Authorization header.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Public endpoints — no token required.",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', json.token);",
+                  "    pm.test('Token saved to collection variable', () => {",
+                  "        pm.expect(json.token).to.be.a('string').and.not.empty;",
+                  "    });",
+                  "}",
+                  "pm.test('Status is 201 Created', () => {",
+                  "    pm.response.to.have.status(201);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"alice\",\n  \"password\": \"secret123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user. Returns 201 + JWT on success. Returns 409 if the username already exists.\n\nThe token is automatically saved to the `jwt_token` collection variable."
+          },
+          "response": [
+            {
+              "name": "201 Created — registration successful",
+              "status": "Created",
+              "code": 201,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9...\"\n}"
+            },
+            {
+              "name": "409 Conflict — username already taken",
+              "status": "Conflict",
+              "code": 409,
+              "header": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', json.token);",
+                  "    pm.test('Token saved to collection variable', () => {",
+                  "        pm.expect(json.token).to.be.a('string').and.not.empty;",
+                  "    });",
+                  "}",
+                  "pm.test('Status is 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Login with existing credentials. Returns 200 + JWT on success. Returns 401 on bad credentials.\n\nThe token is automatically saved to the `jwt_token` collection variable.\n\nDefault dev user: admin / admin123"
+          },
+          "response": [
+            {
+              "name": "200 OK — login successful",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiJ9...\"\n}"
+            },
+            {
+              "name": "401 Unauthorized — bad credentials",
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [],
+              "body": ""
+            }
+          ]
+        },
+        {
+          "name": "Login — wrong password (expect 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401 Unauthorized', () => {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Verifies that wrong credentials return 401."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Protected",
+      "description": "Sample protected endpoint calls. These use the `jwt_token` variable set by Login or Register.\n\nRun Login first, then hit any request here.",
+      "item": [
+        {
+          "name": "Access protected endpoint (valid token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is not 401 or 403', () => {",
+                  "    pm.expect(pm.response.code).to.not.be.oneOf([401, 403]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/hello",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hello"]
+            },
+            "description": "Example protected GET request. Uses the Bearer token from `jwt_token`.\n\nChange the path to any protected endpoint in your service."
+          },
+          "response": []
+        },
+        {
+          "name": "Access protected endpoint (no token — expect 401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 401 Unauthorized', () => {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/hello",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hello"]
+            },
+            "description": "Verifies that hitting a protected endpoint without a token returns 401."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
