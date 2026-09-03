@@ -1,4 +1,4 @@
-package com.authenticationmicro.authenticationmicro.service;
+package com.authenticationmicro.service;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

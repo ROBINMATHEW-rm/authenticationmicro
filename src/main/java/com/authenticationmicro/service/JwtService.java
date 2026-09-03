@@ -1,4 +1,4 @@
-package com.authenticationmicro.authenticationmicro.service;
+package com.authenticationmicro.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

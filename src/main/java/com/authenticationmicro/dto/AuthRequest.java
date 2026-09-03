@@ -1,4 +1,4 @@
-package com.authenticationmicro.authenticationmicro.dto;
+package com.authenticationmicro.dto;
 
 import lombok.Data;
 

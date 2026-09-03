@@ -1,7 +1,7 @@
-package com.authenticationmicro.authenticationmicro.filter;
+package com.authenticationmicro.filter;
 
-import com.authenticationmicro.authenticationmicro.service.AppUserDetailsService;
-import com.authenticationmicro.authenticationmicro.service.JwtService;
+import com.authenticationmicro.service.AppUserDetailsService;
+import com.authenticationmicro.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

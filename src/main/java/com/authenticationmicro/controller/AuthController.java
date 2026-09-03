@@ -1,9 +1,9 @@
-package com.authenticationmicro.authenticationmicro.controller;
+package com.authenticationmicro.controller;
 
-import com.authenticationmicro.authenticationmicro.dto.AuthRequest;
-import com.authenticationmicro.authenticationmicro.dto.AuthResponse;
-import com.authenticationmicro.authenticationmicro.service.AppUserDetailsService;
-import com.authenticationmicro.authenticationmicro.service.JwtService;
+import com.authenticationmicro.dto.AuthRequest;
+import com.authenticationmicro.dto.AuthResponse;
+import com.authenticationmicro.service.AppUserDetailsService;
+import com.authenticationmicro.service.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
