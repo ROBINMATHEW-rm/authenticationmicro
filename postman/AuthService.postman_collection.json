@@ -167,6 +167,11 @@
                 "exec": [
                   "pm.test('Status is 401 Unauthorized', () => {",
                   "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Error response has JSON message', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.status).to.eql(401);",
+                  "    pm.expect(json.message).to.be.a('string').and.not.empty;",
                   "});"
                 ],
                 "type": "text/javascript"
@@ -193,9 +198,19 @@
               "host": ["{{base_url}}"],
               "path": ["auth", "login"]
             },
-            "description": "Verifies that wrong credentials return 401."
+            "description": "Verifies that wrong credentials return 401 with a JSON error body:\n{\n  \"status\": 401,\n  \"message\": \"Invalid username or password\"\n}"
           },
-          "response": []
+          "response": [
+            {
+              "name": "401 Unauthorized — invalid credentials",
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"status\": 401,\n  \"message\": \"Invalid username or password\"\n}"
+            }
+          ]
         }
       ]
     },

@@ -1,6 +1,5 @@
 package com.authenticationmicro.config;
 
-import com.authenticationmicro.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,7 +9,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Spring Security configuration.
@@ -21,18 +19,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * PasswordEncoder is defined in PasswordEncoderConfig to avoid a circular
  * dependency: SecurityConfig → AppUserDetailsService → PasswordEncoder → SecurityConfig.
  *
- * DaoAuthenticationProvider is NOT declared here — Spring Boot auto-configures it
- * from the UserDetailsService and PasswordEncoder beans automatically.
+ * JWT validation is delegated to the API Gateway — no custom filter needed here.
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -44,8 +35,7 @@ public class SecurityConfig {
             )
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+            );
 
         return http.build();
     }
