@@ -3,6 +3,7 @@ package com.authenticationmicro.controller;
 import com.authenticationmicro.dto.AuthRequest;
 import com.authenticationmicro.dto.AuthResponse;
 import com.authenticationmicro.dto.ErrorResponse;
+import com.authenticationmicro.dto.RegisterResponse;
 import com.authenticationmicro.service.AppUserDetailsService;
 import com.authenticationmicro.service.JwtService;
 import org.springframework.http.HttpStatus;
@@ -58,17 +59,20 @@ public class AuthController {
     }
 
     /**
-     * Register a new user and return a JWT on success.
+     * Register a new user and return a success message with JWT on success,
+     * or a JSON error message if the username is already taken.
      * POST /auth/register
      */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody AuthRequest request) {
+    public ResponseEntity<?> register(@RequestBody AuthRequest request) {
         boolean created = userDetailsService.registerUser(request.getUsername(), request.getPassword());
         if (!created) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity
+                    .status(HttpStatus.CONFLICT)
+                    .body(new ErrorResponse(409, "Username already exists"));
         }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
-        String token = jwtService.generateToken(userDetails);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new RegisterResponse("User registered successfully"));
     }
 }
